@@ -1,5 +1,5 @@
 //! Cached data for hashing accounts
-use log::info;
+use log::debug;
 
 #[cfg(test)]
 use crate::pubkey_bins::PubkeyBinCalculator24;
@@ -179,13 +179,13 @@ impl CacheHashDataFile {
     }
 
     fn new_map(file: impl AsRef<Path>, capacity: u64) -> Result<MmapMut, std::io::Error> {
-        info!("new_map b4 create_new");
+        debug!("new_map b4 create_new");
         let mut data = OpenOptions::new()
             .read(true)
             .write(true)
             .create_new(true)
             .open(file)?;
-        info!("new_map after create_new");
+        debug!("new_map after create_new");
 
         // Theoretical performance optimization: write a zero to the end of
         // the file so that we won't have to resize it later, which may be
@@ -342,7 +342,7 @@ impl CacheHashData {
         let capacity = cell_size * (entries as u64) + std::mem::size_of::<Header>() as u64;
 
         let exists = fs::exists(&cache_path).expect("Failed to check file existence");
-        info!("save_internal file still exists: {}", exists);
+        debug!("save_internal file still exists: {}", exists);
 
         let mmap = CacheHashDataFile::new_map(&cache_path, capacity)?;
         m1.stop();
